@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ร้านขนมไข่มุก - ชำระเงิน (ปริตา)</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;600&family=Mali:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Mitr', sans-serif;
+      background: linear-gradient(135deg, #ffdeeb 0%, #ffeaf2 50%, #fbd5e8 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Animation Canvas */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Container Card */
+    .card-container {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(15px);
+      border: 4px solid #ffb6c1;
+      border-radius: 35px;
+      padding: 30px 25px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(255, 105, 180, 0.25),
+                  inset 0 0 15px rgba(255, 255, 255, 0.8);
+      text-align: center;
+      animation: floatContainer 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatContainer {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    /* Music Control Button */
+    .music-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .music-btn:hover {
+      transform: scale(1.1) rotate(15deg);
+      background: #ff1493;
+    }
+
+    /* Header */
+    .header-title {
+      font-family: 'Mali', cursive;
+      color: #ff3385;
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(255, 182, 193, 0.6);
+      margin-bottom: 5px;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      color: #ff66a3;
+      background: #fff0f6;
+      padding: 4px 15px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 20px;
+      border: 1px dashed #ffb6c1;
+    }
+
+    /* Character Chibi Icon */
+    .chibi-avatar {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 15px;
+      background: linear-gradient(135deg, #ffd1dc, #ffe4e1);
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 8px 15px rgba(255, 182, 193, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chibi-avatar svg {
+      width: 85px;
+      height: 85px;
+    }
+
+    /* Account Name Box */
+    .account-owner {
+      background: linear-gradient(90deg, #ff75a0, #ff8dae);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(255, 117, 160, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Payment List */
+    .payment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .payment-card {
+      background: white;
+      border-radius: 20px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 2px solid #ffe1ec;
+      box-shadow: 0 5px 15px rgba(255, 192, 203, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .payment-card:hover {
+      transform: translateY(-2px);
+      border-color: #ff99c8;
+      box-shadow: 0 8px 20px rgba(255, 153, 200, 0.3);
+    }
+
+    .bank-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .bank-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .kplus { background: #00a950; }
+    .truewallet { background: #ff7300; }
+
+    .bank-details .bank-name {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: 400;
+    }
+
+    .bank-details .account-num {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: 0.5px;
+    }
+
+    /* Copy Button */
+    .btn-copy {
+      background: #fff0f5;
+      color: #ff3385;
+      border: 1.5px solid #ffb6c1;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-family: 'Mitr', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-copy:active {
+      transform: scale(0.95);
+      background: #ff3385;
+      color: white;
+    }
+
+    /* LINE Button */
+    .line-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #00c300 0%, #029e02 100%);
+      color: white;
+      text-decoration: none;
+      padding: 14px 20px;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0, 195, 0, 0.35);
+      transition: all 0.3s ease;
+      animation: pulseBtn 2s infinite;
+    }
+
+    @keyframes pulseBtn {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .line-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(0, 195, 0, 0.45);
+    }
+
+    /* Footer Note */
+    .footer-note {
+      margin-top: 18px;
+      font-size: 0.85rem;
+      color: #ff66a3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #ff3385;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 20px rgba(255, 51, 133, 0.4);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Animated Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="card-container">
+    <!-- Music Button -->
+    <button class="music-btn" id="musicToggle" title="เปิด/ปิด เสียงเพลงอบอุ่น">
+      <i class="fa-solid fa-music"></i>
+    </button>
+
+    <!-- Header -->
+    <div class="header-title">ร้านขนมไข่มุก</div>
+    <div class="header-subtitle">🧋 Khai Mukk Sweets Store 🍧</div>
+
+    <!-- Cute Chibi Anime SVG -->
+    <div class="chibi-avatar">
+      <svg viewBox="0 0 100 100">
+        <path d="M 20,30 Q 10,5 30,18 Z" fill="#ffb6c1" />
+        <path d="M 80,30 Q 90,5 70,18 Z" fill="#ffb6c1" />
+        <circle cx="50" cy="22" r="8" fill="#ff3385" />
+        <path d="M 42,22 Q 30,15 38,28 Z" fill="#ff66a3" />
+        <path d="M 58,22 Q 70,15 62,28 Z" fill="#ff66a3" />
+        <circle cx="50" cy="52" r="32" fill="#fff0f5" />
+        <circle cx="50" cy="54" r="30" fill="#fff5f8" />
+        <path d="M 22,48 Q 30,28 50,28 Q 70,28 78,48 Q 65,36 50,40 Q 35,36 22,48 Z" fill="#ffb6c1" />
+        <ellipse cx="38" cy="52" rx="4" ry="6" fill="#4a2e35" />
+        <ellipse cx="62" cy="52" rx="4" ry="6" fill="#4a2e35" />
+        <circle cx="39" cy="50" r="1.5" fill="#fff" />
+        <circle cx="63" cy="50" r="1.5" fill="#fff" />
+        <ellipse cx="32" cy="57" rx="4" ry="2" fill="#ff8dae" opacity="0.6" />
+        <ellipse cx="68" cy="57" rx="4" ry="2" fill="#ff8dae" opacity="0.6" />
+        <path d="M 46,59 Q 50,63 54,59" fill="none" stroke="#ff3385" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+
+    <!-- Account Owner -->
+    <div class="account-owner">
+      <i class="fa-solid fa-heart"></i>
+      <span>ชื่อบัญชี: ปริตา (Parita)</span>
+    </div>
+
+    <!-- Payment List -->
+    <div class="payment-list">
+      
+      <!-- K PLUS -->
+      <div class="payment-card">
+        <div class="bank-info">
+          <div class="bank-icon kplus">K+</div>
+          <div class="bank-details">
+            <div class="bank-name">กสิกรไทย (K PLUS)</div>
+            <div class="account-num">309-2133965</div>
+          </div>
+        </div>
+        <button class="btn-copy" onclick="copyNum('3092133965', 'เลขบัญชีกสิกรไทย')">
+          <i class="fa-regular fa-copy"></i> คัดลอก
+        </button>
+      </div>
+
+      <!-- TrueMoney Wallet -->
+      <div class="payment-card">
+        <div class="bank-info">
+          <div class="bank-icon truewallet">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <div class="bank-details">
+            <div class="bank-name">TrueMoney Wallet</div>
+            <div class="account-num">087-126-9136</div>
+          </div>
+        </div>
+        <button class="btn-copy" onclick="copyNum('0871269136', 'เบอร์ TrueMoney Wallet')">
+          <i class="fa-regular fa-copy"></i> คัดลอก
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Direct Line Button -->
+    <a href="https://line.me/ti/p/mfJaCND3Hm" target="_blank" class="line-btn">
+      <i class="fa-brands fa-line fa-lg"></i>
+      <span>โอนแล้วส่งสลิปคลิกที่นี่ค่ะ</span>
+    </a>
+
+    <div class="footer-note">
+      <i class="fa-solid fa-sparkles"></i>
+      <span>โอนแล้วอย่าลืมแจ้งสลิปในไลน์นะคะ ขอบคุณค่ะ</span>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast" id="toast">คัดลอกสำเร็จแล้วค่ะ! ✨</div>
+
+  <script>
+    // Copy Function
+    function copyNum(text, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`คัดลอก ${label} แล้วค่ะ! 💕`);
+      }).catch(() => {
+        const input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast(`คัดลอก ${label} แล้วค่ะ! 💕`);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Audio Synthetic Background Music (Cozy Ambient)
+    let audioCtx = null;
+    let isPlaying = false;
+    let timerId = null;
+
+    const musicBtn = document.getElementById('musicToggle');
+
+    function playCozySound() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23];
+      let index = 0;
+
+      timerId = setInterval(() => {
+        if (!isPlaying) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(notes[index % notes.length], audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 2);
+
+        index++;
+      }, 800);
+    }
+
+    musicBtn.addEventListener('click', () => {
+      if (!isPlaying) {
+        isPlaying = true;
+        musicBtn.style.background = '#ff1493';
+        musicBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        playCozySound();
+        showToast('🎵 กำลังเล่นเพลงบรรยากาศผ่อนคลาย...');
+      } else {
+        isPlaying = false;
+        clearInterval(timerId);
+        musicBtn.style.background = '#ff69b4';
+        musicBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
+        showToast('🔇 ปิดเสียงเพลงแล้วค่ะ');
+      }
+    });
+
+    // Particle Canvas Animation
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const particles = Array.from({ length: 30 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 8 + 4,
+      speedY: Math.random() * 1 + 0.3,
+      opacity: Math.random() * 0.6 + 0.3,
+      type: Math.random() > 0.5 ? 'heart' : 'circle'
+    }));
+
+    function drawHeart(x, y, size, opacity) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.translate(x, y);
+      ctx.scale(size / 10, size / 10);
+      ctx.fillStyle = `rgba(255, 105, 180, ${opacity})`;
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-5, -5, -10, 0, 0, 10);
+      ctx.bezierCurveTo(10, 0, 5, -5, 0, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        p.y -= p.speedY;
+        if (p.y < -20) {
+          p.y = canvas.height + 20;
+          p.x = Math.random() * canvas.width;
+        }
+
+        if (p.type === 'heart') {
+          drawHeart(p.x, p.y, p.size, p.opacity);
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 182, 193, ${p.opacity})`;
+          ctx.fill();
+        }
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
